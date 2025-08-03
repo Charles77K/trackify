@@ -4,9 +4,9 @@ import { ImBook } from "react-icons/im";
 import { FaComments, FaGraduationCap, FaPowerOff } from "react-icons/fa";
 import { FaUserTie } from "react-icons/fa";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import Modal from "../Modal";
-import Toast from "../../../lib/Toast";
-import type { ModalRef } from "../Modal";
+import Modal from "../ui/Modal";
+import Toast from "../../lib/Toast";
+import type { ModalRef } from "../ui/Modal";
 
 const NAV_LINKS = [
   { path: "/", label: "Dashboard", icon: <MdDashboard /> },
