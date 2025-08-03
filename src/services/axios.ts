@@ -2,11 +2,18 @@
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
+  type InternalAxiosRequestConfig,
   type AxiosResponse,
   AxiosError,
 } from "axios";
+import TokenStorage from "./tokenStorage";
+import Toast from "../lib/Toast";
 
-export const baseURL: string = import.meta.env.VITE_API_BASE_URL;
+export const baseURL: string = import.meta.env.VITE_BASE_URL;
+
+interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 interface ErrorResponse {
   message: string;
@@ -19,10 +26,6 @@ interface CustomError extends Error {
   data?: any;
 }
 
-interface DefaultHeaders {
-  [key: string]: string;
-}
-
 interface QueryParams {
   [key: string]: any;
 }
@@ -30,7 +33,7 @@ interface QueryParams {
 class AxiosHelper {
   private client: AxiosInstance;
 
-  constructor(defaultHeaders: DefaultHeaders = {}) {
+  constructor(defaultHeaders = {}) {
     this.client = axios.create({
       baseURL,
       headers: {
@@ -39,37 +42,83 @@ class AxiosHelper {
       },
     });
 
-    // Remove content type when needed
+    this.setupInterceptors();
+  }
+
+  private setupInterceptors() {
+    // Request interceptor to add auth token
     this.client.interceptors.request.use((config) => {
-      if (config.data instanceof FormData) {
-        delete config.headers!["Content-Type"]; // Let browser set it
+      const token = TokenStorage.getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
     });
 
-    // Add interceptors for auth token
-    this.client.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-          config.headers!.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error: AxiosError) => Promise.reject(error)
-    );
-
-    // Add response interceptor for error handling
+    // Response interceptor to handle token refresh and errors
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
-      (error: AxiosError) => {
+      async (error: AxiosError) => {
+        const originalRequest = error.config as ExtendedAxiosRequestConfig;
         const { response } = error;
-        // Handle specific HTTP error codes
-        if (response && response.status === 401) {
-          // Handle unauthorized access (e.g., redirect to login)
-          console.error("Unauthorized access. Please login again.");
-          // Potentially trigger a logout or redirect
+
+        // Handle token refresh for 401 errors
+        const isAuthRequest =
+          originalRequest?.url?.includes("/login") ||
+          originalRequest?.url?.includes("/token");
+
+        if (
+          response?.status === 401 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          !isAuthRequest
+        ) {
+          originalRequest._retry = true;
+
+          try {
+            const refreshToken = TokenStorage.getRefreshToken();
+            if (!refreshToken) {
+              throw new Error("No refresh token found");
+            }
+
+            const res = await this.client.post("/auth/token/refresh/", {
+              refresh: refreshToken,
+            });
+
+            const newAccessToken = res.data.access;
+
+            // Update tokens using the specific implementation
+            TokenStorage.setTokens({
+              accessToken: newAccessToken,
+              refreshToken,
+            });
+
+            // Update default headers for future requests
+            this.client.defaults.headers.common[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+
+            // Update the failed request's headers
+            if (originalRequest.headers) {
+              originalRequest.headers[
+                "Authorization"
+              ] = `Bearer ${newAccessToken}`;
+            }
+
+            // Retry the original request
+            return this.client(originalRequest);
+          } catch (err) {
+            TokenStorage.clearTokens();
+            Toast.error("Session Expired", "Please login again.");
+            return Promise.reject(err);
+          }
         }
+
+        // Handle other 401 errors
+        if (response?.status === 401) {
+          Toast.error("Error", "Unauthorized access. Please login again.");
+        }
+
         return Promise.reject(error);
       }
     );
@@ -127,7 +176,7 @@ class AxiosHelper {
     try {
       const url = endpoint.includes(":id")
         ? endpoint.replace(":id", id.toString())
-        : `${endpoint}${id}`;
+        : `${endpoint}/${id}`;
       const response: AxiosResponse<T> = await this.client.get(url, { params });
       return response.data;
     } catch (error) {

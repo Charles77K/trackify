@@ -9,7 +9,7 @@ const Button = ({ children, className, ...props }: IButton) => {
   return (
     <button
       className={cn(
-        "w-full p-2 bg-primary text-white disabled:opacity-40 disabled:cursor-not-allowed rounded-lg hover:bg-primary/80 cursor-pointer transition-all ease-in-out duration-200",
+        "w-full p-2 bg-sidebar text-white disabled:opacity-40 disabled:cursor-not-allowed rounded-lg hover:bg-sidebar-active cursor-pointer transition-all ease-in-out duration-200",
         className
       )}
       {...props}

@@ -2,8 +2,8 @@ import { z } from "zod";
 
 // Login schema
 export const loginSchema = z.object({
-  email: z
-    .email("Please enter a valid email address")
+  username: z
+    .string("Please enter a valid username")
     .nonempty("Reg_no must be at least 1 character"),
   password: z
     .string()

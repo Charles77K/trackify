@@ -41,9 +41,9 @@ const PasswordInput = forwardRef<HTMLInputElement, IPasswordInput>(
             className="cursor-pointer"
           >
             {showPassword ? (
-              <EyeOff className="size-5 text-primary" />
+              <EyeOff className="size-5 text-sidebar" />
             ) : (
-              <Eye className="size-5 text-primary" />
+              <Eye className="size-5 text-sidebar" />
             )}
           </div>
         </div>

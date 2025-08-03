@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import InputField from "../components/ui/Input";
 import PasswordInput from "../components/ui/PasswordInput";
 import Button from "../components/ui/Button";
@@ -5,9 +6,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { loginSchema, type LoginSchema } from "../lib/schema";
 import { useNavigate } from "react-router-dom";
+import { useCreate } from "../services/tanstack-helpers";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../store/store";
+import { login } from "../store/slices/authSlice";
+import Toast from "../lib/Toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
+
+  const { mutate, isPending } = useCreate<LoginSchema>("/auth/login/");
+
+  // hook form
   const {
     register,
     handleSubmit,
@@ -18,8 +29,18 @@ const Login = () => {
   });
 
   const onSubmit = async (data: LoginSchema) => {
-    console.log("Form data being sent:", data);
-    navigate("/");
+    console.log(data);
+    mutate(data, {
+      onSuccess: (data: any) => {
+        dispatch(login(data));
+        Toast.success("Success", "Login successful");
+        navigate("/");
+      },
+      onError: (err: any) => {
+        console.log("Error", err);
+        Toast.error("Error", "An unexpected error occurred please try again");
+      },
+    });
   };
 
   return (
@@ -29,7 +50,7 @@ const Login = () => {
         <section className="flex-1 flex-col-center">
           <div className="max-w-md mx-auto w-full">
             <div className="mb-10">
-              <h1 className="font-semibold text-primary text-center text-2xl md:text-3xl mb-3">
+              <h1 className="font-semibold text-sidebar text-center text-2xl md:text-3xl mb-3">
                 Welcome back to Trackify
               </h1>
               <p className="font-inter text-center text-text-primary font-light text-sm">
@@ -39,11 +60,11 @@ const Login = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <InputField
-                {...register("email")}
-                label="Email"
-                placeholder="Enter your email"
-                error={errors.email}
-                autoComplete="email"
+                {...register("username")}
+                label="Username"
+                placeholder="Enter your username"
+                error={errors.username}
+                autoComplete="username"
               />
 
               <PasswordInput
@@ -54,8 +75,12 @@ const Login = () => {
                 autoComplete="current-password"
               />
 
-              <Button type="submit" className="w-full py-3">
-                <p>Sign in </p>
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full py-3"
+              >
+                <p>{isPending ? "Logging In" : "Login"} </p>
               </Button>
             </form>
           </div>
