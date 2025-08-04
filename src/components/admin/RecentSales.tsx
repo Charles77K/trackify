@@ -5,6 +5,7 @@ import {
   flexRender,
   createColumnHelper,
 } from "@tanstack/react-table";
+import { useFetch } from "../../services/tanstack-helpers";
 
 const columnHelper = createColumnHelper<Sale>();
 
@@ -50,6 +51,8 @@ const salesData: Sale[] = [
 ];
 
 const RecentSales = () => {
+  // const { data: recentSales } = useFetch("/dashboard/recent-sales/");
+
   const columns = useMemo(
     () => [
       columnHelper.accessor("id", {

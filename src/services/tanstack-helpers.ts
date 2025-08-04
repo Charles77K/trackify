@@ -108,13 +108,11 @@ export const useUpdate = <TData = any, TUpdateData = any>(
   const queryClient: QueryClient = useQueryClient();
 
   return useMutation<TData, Error, UpdateVariables>({
-    // Expect an object with id and data properties
     mutationFn: ({ id, data }: UpdateVariables) =>
       api.patch<TData, TUpdateData>(endpoint, id, data as TUpdateData),
     onSuccess: (_, variables) => {
-      // After updating, refresh queries for this item and list
       queryClient.invalidateQueries({ queryKey: [endpoint, variables.id] });
-      queryClient.invalidateQueries({ queryKey: [endpoint] });
+      queryClient.invalidateQueries({ queryKey: [`${endpoint}/`] });
 
       if (options.onSuccess) {
         options.onSuccess();
@@ -137,7 +135,7 @@ export const useDelete = <TData = any>(
     mutationFn: (id: string | number) => api.delete<TData>(endpoint, id),
     onSuccess: () => {
       // After deleting, refresh queries for this endpoint
-      queryClient.invalidateQueries({ queryKey: [endpoint] });
+      queryClient.invalidateQueries({ queryKey: [`${endpoint}/`] });
 
       if (options.onSuccess) {
         options.onSuccess();

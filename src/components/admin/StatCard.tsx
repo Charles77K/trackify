@@ -10,11 +10,12 @@ const StatCard = ({
     color: string;
     trend: string;
     change: string;
-    value: string;
+    value: string | number;
     title: string;
   };
 }) => {
   const randomColor = getRandomColor();
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 hover:shadow-md transition-shadow">
       <div className="flex flex-col items-start mb-4">

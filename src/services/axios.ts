@@ -215,8 +215,8 @@ class AxiosHelper {
     data: D
   ): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await this.client.patch(
-        `${endpoint}/${id}`,
+      const response: AxiosResponse<T> = await this.client.put(
+        `${endpoint}/${id}/`,
         data
       );
       return response.data;
@@ -228,7 +228,7 @@ class AxiosHelper {
   async delete<T = any>(endpoint: string, id: string | number): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.client.delete(
-        `${endpoint}/${id}`
+        `${endpoint}/${id}/`
       );
       return response.data;
     } catch (error) {

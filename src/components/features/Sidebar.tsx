@@ -1,34 +1,58 @@
 import React, { useState, useEffect } from "react";
 import { MdDashboard, MdMenu, MdClose } from "react-icons/md";
 import { ImBook } from "react-icons/im";
-import { FaComments, FaGraduationCap, FaPowerOff } from "react-icons/fa";
+import {
+  FaComments,
+  FaGraduationCap,
+  FaPowerOff,
+  FaShopify,
+  FaShoppingBag,
+} from "react-icons/fa";
 import { FaUserTie } from "react-icons/fa";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Modal from "../ui/Modal";
 import Toast from "../../lib/Toast";
 import type { ModalRef } from "../ui/Modal";
+import { useCreate } from "../../services/tanstack-helpers";
+import TokenStorage from "../../services/tokenStorage";
 
 const NAV_LINKS = [
   { path: "/", label: "Dashboard", icon: <MdDashboard /> },
-  { path: "/admin/courses", label: "Inventory", icon: <ImBook /> },
-  { path: "/admin/classrooms", label: "Sales", icon: <FaGraduationCap /> },
-  { path: "/admin/lecturers", label: "Reports", icon: <FaUserTie /> },
-  { path: "/admin/purchases", label: "Purchasing", icon: <FaComments /> },
-  { path: "/admin/outlets", label: "Outlets", icon: <FaComments /> },
-  { path: "/admin/users", label: "Users", icon: <FaComments /> },
-  { path: "/admin/settings", label: "Settings", icon: <FaComments /> },
+  { path: "/inventory", label: "Inventory", icon: <ImBook /> },
+  { path: "/sales", label: "Sales", icon: <FaShopify /> },
+  { path: "/categories", label: "Categories", icon: <FaUserTie /> },
+  { path: "/purchases", label: "Purchases", icon: <FaShoppingBag /> },
+  { path: "/outlets", label: "Outlets", icon: <FaComments /> },
+  { path: "/users", label: "Users", icon: <FaComments /> },
+  { path: "/settings", label: "Settings", icon: <FaComments /> },
 ];
 
 const Sidebar = () => {
+  const { mutate, isPending } = useCreate("/auth/logout/");
+  const refreshToken = TokenStorage.getRefreshToken();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const modalRef = React.useRef<ModalRef>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = () => {
-    Toast.success("Success", "You've successfully logged out");
-    modalRef.current?.close();
-    navigate("/login", { replace: true });
+    mutate(
+      { refresh_token: refreshToken },
+      {
+        onSuccess: () => {
+          Toast.success("Success", "You've successfully logged out");
+          modalRef.current?.close();
+          navigate("/login", { replace: true });
+        },
+        onError: (error) => {
+          Toast.error(
+            "Error",
+            "An error occurred while logging out please try again later"
+          );
+          console.log(error);
+        },
+      }
+    );
   };
 
   useEffect(() => {
@@ -146,8 +170,9 @@ const Sidebar = () => {
         ref={modalRef}
         onPositive={handleLogout}
         title="Are you sure you want to logout?"
-        positiveText="Yes"
+        positiveText={isPending ? "Loading" : "Yes"}
         negativeText="No"
+        isDisabled={isPending}
       />
     </>
   );

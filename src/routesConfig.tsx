@@ -1,6 +1,14 @@
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./layouts/ProtectedRoute";
-import { Dashboard, Login } from "./pages";
+import {
+  Dashboard,
+  Inventory,
+  Login,
+  Sales,
+  Users,
+  Purchases,
+  Categories,
+} from "./pages";
 
 const routesConfig = [
   {
@@ -10,7 +18,14 @@ const routesConfig = [
         <MainLayout />
       </ProtectedRoute>
     ),
-    children: [{ index: true, element: <Dashboard /> }],
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: "inventory", element: <Inventory /> },
+      { path: "sales", element: <Sales /> },
+      { path: "purchases", element: <Purchases /> },
+      { path: "users", element: <Users /> },
+      { path: "categories", element: <Categories /> },
+    ],
   },
   {
     path: "/login",
