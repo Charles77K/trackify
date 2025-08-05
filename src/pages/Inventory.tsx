@@ -180,6 +180,24 @@ const Inventory = () => {
         header: "Selling Price",
         cell: EditableTableCell,
       }),
+      columnHelper.accessor("is_out_of_stock", {
+        header: "Status",
+        cell: ({ row }) => {
+          const isOutOfStock = row.original.is_out_of_stock;
+          const bgColor = isOutOfStock
+            ? "bg-yellow-100 text-yellow-800"
+            : "bg-green-100 text-green-800";
+
+          return (
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${bgColor}`}
+            >
+              {isOutOfStock ? "Out of Stock" : "In Stock"}
+            </span>
+          );
+        },
+      }),
+
       columnHelper.display({
         id: "actions",
         header: "Actions",
