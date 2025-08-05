@@ -95,15 +95,7 @@ const CreateSale = ({ onComplete }: { onComplete: () => void }) => {
         {...register("quantity", { valueAsNumber: true })}
         placeholder="Enter quantity"
         error={errors?.quantity}
-      />
-
-      <InputField
-        label="Total Price"
-        type="text"
-        {...register("total_price")}
-        placeholder="Enter total price (e.g. 250.00)"
-        error={errors?.total_price}
-      />
+        />
 
       <Button
         disabled={isCreating}
