@@ -43,7 +43,7 @@ function SelectInputInner<T>(
       <label className="text-xs">{label}</label>
       <select
         ref={ref}
-        className={`block bg-gray-100 border text-xs rounded-md ${className}`}
+        className={`block bg-gray-100 p-3 w-full border border-gray-200 text-xs rounded-md ${className}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={isDisabled}

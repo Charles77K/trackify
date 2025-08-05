@@ -8,6 +8,7 @@ import {
   Users,
   Purchases,
   Categories,
+  Outlets,
 } from "./pages";
 
 const routesConfig = [
@@ -25,6 +26,7 @@ const routesConfig = [
       { path: "purchases", element: <Purchases /> },
       { path: "users", element: <Users /> },
       { path: "categories", element: <Categories /> },
+      { path: "outlets", element: <Outlets /> },
     ],
   },
   {

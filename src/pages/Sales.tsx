@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,6 +9,9 @@ import {
 import { useFetch } from "../services/tanstack-helpers";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import EmptyState from "../components/admin/EmptyState";
+import type { ModalRef } from "../components/ui/Modal";
+import CreateModal from "../components/admin/CreateModal";
+import CreateSale from "../components/admin/CreateSale";
 
 type Sales = {
   id: number;
@@ -26,6 +29,7 @@ type Sales = {
 const columnHelper = createColumnHelper<Sales>();
 
 const Sales = () => {
+  const modalRef = useRef<ModalRef>(null);
   const { data, isLoading } = useFetch("/sales/");
   const sales = data?.results;
 
@@ -95,8 +99,7 @@ const Sales = () => {
         <h2 className="text-xl font-semibold text-sidebar">User Management</h2>
         <button
           onClick={() => {
-            // Your create/add new user hook here
-            console.log("Add new user");
+            modalRef.current?.open();
           }}
           className="px-4 py-2 text-sm bg-sidebar text-white rounded hover:bg-sidebar-active transition"
         >
@@ -140,6 +143,11 @@ const Sales = () => {
 
       {/* Empty state */}
       {sales && sales.length === 0 && <EmptyState title="sales" />}
+
+      {/* create modal */}
+      <CreateModal ref={modalRef}>
+        <CreateSale onComplete={() => modalRef.current?.close()} />
+      </CreateModal>
     </div>
   );
 };

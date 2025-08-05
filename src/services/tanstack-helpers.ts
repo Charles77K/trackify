@@ -109,7 +109,7 @@ export const useUpdate = <TData = any, TUpdateData = any>(
 
   return useMutation<TData, Error, UpdateVariables>({
     mutationFn: ({ id, data }: UpdateVariables) =>
-      api.patch<TData, TUpdateData>(endpoint, id, data as TUpdateData),
+      api.update<TData, TUpdateData>(endpoint, id, data as TUpdateData),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [endpoint, variables.id] });
       queryClient.invalidateQueries({ queryKey: [`${endpoint}/`] });

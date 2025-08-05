@@ -15,23 +15,18 @@ import TableSkeleton from "../components/admin/TableSkeleton";
 import ErrorHandler from "../components/admin/ErrorHandler";
 import EmptyState from "../components/admin/EmptyState";
 import Modal from "../components/ui/Modal";
+import CreateModal from "../components/admin/CreateModal";
+import CreateOutlet from "../components/admin/CreateOutlet";
 
-// Inventory type
-export type InventoryItem = {
+// Outlet type
+export type OutletItem = {
   id: number;
+  total_sales: string;
   name: string;
-  category: number;
-  category_name: string;
-  quantity: number;
-  min_quantity: number;
-  unit: string;
-  cost_price: string;
-  selling_price: string;
-  is_low_stock: boolean;
-  is_out_of_stock: boolean;
+  location: string;
 };
 
-const columnHelper = createColumnHelper<InventoryItem>();
+const columnHelper = createColumnHelper<OutletItem>();
 
 const EditCell = ({ row, table }: any) => {
   const meta = table.options.meta;
@@ -101,8 +96,9 @@ const EditCell = ({ row, table }: any) => {
   );
 };
 
-const Inventory = () => {
+const Outlets = () => {
   const modalRef = useRef<ModalRef>(null);
+  const createModalRef = useRef<ModalRef>(null);
   const [editedRows, setEditedRows] = useState<Record<string, boolean>>({});
   const [itemId, setItemId] = useState<string | number>("");
 
@@ -112,22 +108,18 @@ const Inventory = () => {
     isError,
     error,
     refetch,
-  } = useFetch<{ results: InventoryItem[] }>("/inventory/");
+  } = useFetch<{ results: OutletItem[] }>("/outlets/");
 
-  const [tableData, setTableData] = useState<InventoryItem[]>([]);
-  const [originalData, setOriginalData] = useState<InventoryItem[]>([]);
+  const [tableData, setTableData] = useState<OutletItem[]>([]);
+  const [originalData, setOriginalData] = useState<OutletItem[]>([]);
 
-  const { mutate: deleteItem, isPending: isDeleting } = useDelete("/inventory");
-  const { mutate: updateItem, isPending: isUpdating } = useUpdate("/inventory");
+  const { mutate: deleteItem, isPending: isDeleting } = useDelete("/outlets");
+  const { mutate: updateItem, isPending: isUpdating } = useUpdate("/outlets");
 
-  // fetch categories
-  const { data: categories } = useFetch("/categories/");
-
-  const prevDataRef = useRef<InventoryItem[]>(null);
+  const prevDataRef = useRef<OutletItem[]>(null);
 
   useEffect(() => {
     if (data.results && Array.isArray(data?.results)) {
-      // Only update if the data has actually changed
       const currentData = JSON.stringify(data.results);
       const prevData = JSON.stringify(prevDataRef.current);
 
@@ -144,49 +136,31 @@ const Inventory = () => {
     setItemId(id);
   };
 
-  // Fix: Include categories in the dependency array
   const columns = useMemo(
     () => [
       columnHelper.accessor("name", {
-        header: "Item Name",
+        header: "Outlet Name",
         cell: EditableTableCell,
       }),
-      columnHelper.accessor("category_name", {
-        header: "Category",
-        cell: (props) => (
-          <EditableTableCell
-            {...props}
-            inputType="select"
-            selectOptions={categories}
-          />
-        ),
-      }),
-      columnHelper.accessor("quantity", {
-        header: "Stock",
+      columnHelper.accessor("total_sales", {
+        header: "Total sales",
         cell: EditableTableCell,
       }),
-      columnHelper.accessor("min_quantity", {
-        header: "Min Level",
+      columnHelper.accessor("location", {
+        header: "location",
         cell: EditableTableCell,
       }),
-      columnHelper.accessor("cost_price", {
-        header: "Cost Price",
-        cell: EditableTableCell,
-      }),
-      columnHelper.accessor("selling_price", {
-        header: "Selling Price",
-        cell: EditableTableCell,
-      }),
+
       columnHelper.display({
         id: "actions",
         header: "Actions",
         cell: EditCell,
       }),
     ],
-    [categories] // Add categories to dependency array
+    []
   );
 
-  const table = useReactTable<InventoryItem>({
+  const table = useReactTable<OutletItem>({
     data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -208,7 +182,7 @@ const Inventory = () => {
             { id: updatedRow.id, data: updatedRow },
             {
               onSuccess: () => {
-                Toast.success("Updated", "Inventory item updated");
+                Toast.success("Updated", "Outlet updated");
                 setOriginalData((old) =>
                   old.map((row, index) =>
                     index === rowIndex ? tableData[rowIndex] : row
@@ -236,9 +210,8 @@ const Inventory = () => {
 
   if (isLoading) content = <TableSkeleton columns={7} rows={5} />;
   else if (isError)
-    content = <ErrorHandler error={error} retry={refetch} title="Inventory" />;
-  else if (tableData.length === 0)
-    content = <EmptyState title="inventory items" />;
+    content = <ErrorHandler error={error} retry={refetch} title="Outlets" />;
+  else if (tableData.length === 0) content = <EmptyState title="outlets" />;
   else
     content = (
       <table className="w-full">
@@ -281,11 +254,12 @@ const Inventory = () => {
   return (
     <div className="w-full p-4 bg-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Inventory Management
-        </h1>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          <Plus size={18} /> Add Item
+        <h1 className="text-2xl font-bold text-gray-900">Outlet Management</h1>
+        <button
+          onClick={() => createModalRef.current?.open()}
+          className="flex items-center gap-2 bg-sidebar text-white px-4 py-2 rounded-lg hover:bg-sidebar-active"
+        >
+          <Plus size={18} /> Add Outlet
         </button>
       </div>
 
@@ -293,26 +267,32 @@ const Inventory = () => {
         {content}
       </div>
 
+      {/* delete modal */}
       <Modal
         ref={modalRef}
-        title="Are you sure you want to delete this item?"
+        title="Are you sure you want to delete this outlet?"
         negativeText="Cancel"
         positiveText={isDeleting ? "Deleting" : "Yes"}
         onPositive={() => {
           deleteItem(itemId, {
             onSuccess: () => {
-              Toast.success("Deleted", "Item deleted successfully");
+              Toast.success("Deleted", "Outlet deleted successfully");
               modalRef.current?.close();
               refetch();
             },
             onError: () => {
-              Toast.error("Failed", "Item could not be deleted");
+              Toast.error("Failed", "Outlet could not be deleted");
             },
           });
         }}
       />
+
+      {/* create modal */}
+      <CreateModal ref={createModalRef}>
+        <CreateOutlet onComplete={() => createModalRef.current?.close()} />
+      </CreateModal>
     </div>
   );
 };
 
-export default Inventory;
+export default Outlets;

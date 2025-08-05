@@ -200,7 +200,7 @@ class AxiosHelper {
   ): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.client.put(
-        `${endpoint}/${id}`,
+        `${endpoint}/${id}/`,
         data
       );
       return response.data;
