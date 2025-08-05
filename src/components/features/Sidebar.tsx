@@ -25,13 +25,17 @@ const NAV_LINKS = [
 ];
 
 const Sidebar = () => {
-  const { mutate, isPending } = useCreate("/auth/logout/");
-  const refreshToken = TokenStorage.getRefreshToken();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const modalRef = React.useRef<ModalRef>(null);
+
+  const { mutate, isPending } = useCreate("/auth/logout/");
+
+  const refreshToken = TokenStorage.getRefreshToken();
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
+
+  // handle logout
   const handleLogout = () => {
     mutate(
       { refresh_token: refreshToken },

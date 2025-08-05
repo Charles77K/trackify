@@ -84,7 +84,7 @@ class AxiosHelper {
             const res = await this.client.post("/auth/token/refresh/", {
               refresh: refreshToken,
             });
-
+            console.log(res);
             const newAccessToken = res.data.access;
 
             // Update tokens using the specific implementation
@@ -205,7 +205,7 @@ class AxiosHelper {
       );
       return response.data;
     } catch (error) {
-      throw this.handleError(error as AxiosError);
+      throw this.handleError(error);
     }
   }
 
@@ -221,7 +221,7 @@ class AxiosHelper {
       );
       return response.data;
     } catch (error) {
-      throw this.handleError(error as AxiosError);
+      throw this.handleError(error);
     }
   }
 
@@ -232,7 +232,7 @@ class AxiosHelper {
       );
       return response.data;
     } catch (error) {
-      throw this.handleError(error as AxiosError);
+      throw this.handleError(error);
     }
   }
 
@@ -241,7 +241,7 @@ class AxiosHelper {
       const response: AxiosResponse<T> = await this.client.request(config);
       return response.data;
     } catch (error) {
-      throw this.handleError(error as AxiosError);
+      throw this.handleError(error);
     }
   }
 
@@ -250,7 +250,7 @@ class AxiosHelper {
       const response: AxiosResponse<T> = await axios.get(endpoint);
       return response.data;
     } catch (error) {
-      throw this.handleError(error as AxiosError);
+      throw this.handleError(error);
     }
   }
 }

@@ -4,7 +4,7 @@ import { z } from "zod";
 export const loginSchema = z.object({
   username: z
     .string("Please enter a valid username")
-    .nonempty("Reg_no must be at least 1 character"),
+    .nonempty("Username must be at least 1 character"),
   password: z
     .string()
     .min(5, { message: "Password must be at least 5 characters" })

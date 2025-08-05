@@ -29,7 +29,6 @@ const Login = () => {
   });
 
   const onSubmit = async (data: LoginSchema) => {
-    console.log(data);
     mutate(data, {
       onSuccess: (data: any) => {
         dispatch(login(data));
@@ -44,95 +43,42 @@ const Login = () => {
   };
 
   return (
-    <div className="p-4 min-h-screen">
-      <main className="grid grid-cols-1 md:grid-cols-2 h-screen">
-        {/* login form section */}
-        <section className="flex-1 flex-col-center">
-          <div className="max-w-md mx-auto w-full">
-            <div className="mb-10">
-              <h1 className="font-semibold text-sidebar text-center text-2xl md:text-3xl mb-3">
-                Welcome back to SmartQ
-              </h1>
-              <p className="font-inter text-center text-text-primary font-light text-sm">
-                Enter your username and password to continue
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <InputField
-                {...register("username")}
-                label="Username"
-                placeholder="Enter your username"
-                error={errors.username}
-                autoComplete="username"
-              />
-
-              <PasswordInput
-                {...register("password")}
-                label="Password"
-                placeholder="Enter your password"
-                error={errors.password}
-                autoComplete="current-password"
-              />
-
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="w-full py-3"
-              >
-                <p>{isPending ? "Logging In" : "Login"} </p>
-              </Button>
-            </form>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        {/* Form container with shadow and background */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 md:p-10">
+          <div className="mb-10">
+            <h1 className="font-semibold text-sidebar text-center text-2xl md:text-3xl mb-3">
+              Welcome back to SmartQ
+            </h1>
+            <p className="font-inter text-center text-text-primary font-light text-sm">
+              Enter your username and password to continue
+            </p>
           </div>
-        </section>
 
-        {/* hero section */}
-        <section className="flex-1 hidden md:flex rounded-xl relative overflow-hidden">
-          <img
-            src="/vector.jpg"
-            className="h-full w-full object-cover rounded-xl"
-            alt="Hotel management"
-          />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <InputField
+              {...register("username")}
+              label="Username"
+              placeholder="Enter your username"
+              error={errors.username}
+              autoComplete="username"
+            />
 
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-transparent rounded-xl"></div>
+            <PasswordInput
+              {...register("password")}
+              label="Password"
+              placeholder="Enter your password"
+              error={errors.password}
+              autoComplete="current-password"
+            />
 
-          {/* Content overlay */}
-          <div className="absolute inset-0 flex flex-col justify-center items-start p-8 md:p-12">
-            <div className="text-white max-w-lg">
-              <h2 className="text-3xl md:text-4xl font-bold mb-10 leading-tight">
-                Streamline Your Hotel Operations
-              </h2>
-              <p className="text-lg md:text-xl mb-6 text-white/90 leading-relaxed">
-                Manage inventory, track bookings, and optimize your hotel's
-                performance with our comprehensive management system.
-              </p>
-
-              {/* Feature highlights */}
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span className="text-white/95">
-                    Real-time inventory tracking
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span className="text-white/95">
-                    Automated booking management
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span className="text-white/95">
-                    Comprehensive analytics dashboard
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+            <Button type="submit" disabled={isPending} className="w-full py-3">
+              <p>{isPending ? "Logging In" : "Login"} </p>
+            </Button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
