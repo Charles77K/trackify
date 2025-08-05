@@ -6,7 +6,7 @@ import {
   flexRender,
   createColumnHelper,
 } from "@tanstack/react-table";
-import { Check, Edit2, Trash2, X } from "lucide-react";
+import { Check, Edit2, Trash2, X, ArrowLeft } from "lucide-react";
 import { useDelete, useFetch, useUpdate } from "../services/tanstack-helpers";
 import EditableTableCell from "../components/admin/EditableTableCell";
 import type { ModalRef } from "../components/ui/Modal";
@@ -98,10 +98,47 @@ const EditCell = ({ row, table }: any) => {
   );
 };
 
+// Unauthorized Access Component
+const UnauthorizedAccess = () => {
+  const handleGoBack = () => {
+    window.history.back();
+  };
+
+  return (
+    <div className="w-full p-4">
+      <div className="flex flex-col items-center justify-center min-h-96 bg-white rounded-lg shadow border">
+        <div className="text-center space-y-4">
+          <div className="text-6xl text-red-500 mb-4">🚫</div>
+          <h2 className="text-2xl font-bold text-gray-800">Access Denied</h2>
+          <p className="text-gray-600 max-w-md">
+            You don't have permission to access this page. Only managers can
+            view and manage users.
+          </p>
+          <button
+            onClick={handleGoBack}
+            className="inline-flex items-center px-4 py-2 bg-sidebar text-white rounded-lg hover:bg-sidebar-active transition-colors"
+          >
+            <ArrowLeft size={16} className="mr-2" />
+            Go Back
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Users = () => {
   const modalRef = useRef<ModalRef>(null);
   const [userId, setUserId] = useState<string | number>("");
   const [editedRows, setEditedRows] = useState<Record<string, boolean>>({});
+
+  // Fetch current user data to check role
+  const {
+    data: currentUser,
+    isLoading: isLoadingCurrentUser,
+    isError: isCurrentUserError,
+  } = useFetch<User>("/auth/profile/"); // Adjust this endpoint based on your API
+
   const {
     data = { results: [] },
     isLoading,
@@ -116,6 +153,9 @@ const Users = () => {
   const { mutate: updateUser, isPending: isUpdating } = useUpdate("/users");
 
   const prevDataRef = useRef<User[]>(null);
+
+  // Check if user is authorized (manager role)
+  const isAuthorized = currentUser?.role === "manager";
 
   useEffect(() => {
     if (data.results && Array.isArray(data.results)) {
@@ -210,6 +250,21 @@ const Users = () => {
       },
     },
   });
+
+  // Show loading state while checking user authorization
+  if (isLoadingCurrentUser) {
+    return <TableSkeleton columns={5} rows={5} />;
+  }
+
+  // Show error if current user data couldn't be fetched
+  if (isCurrentUserError) {
+    return <UnauthorizedAccess />;
+  }
+
+  // Show unauthorized access if user is not a manager
+  if (!isAuthorized) {
+    return <UnauthorizedAccess />;
+  }
 
   let content;
   if (isLoading) content = <TableSkeleton columns={5} rows={5} />;

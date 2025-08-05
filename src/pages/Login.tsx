@@ -37,7 +37,7 @@ const Login = () => {
       },
       onError: (err: any) => {
         console.log("Error", err);
-        Toast.error("Error", "An unexpected error occurred please try again");
+        Toast.error("Error", "Incorrect username or password");
       },
     });
   };
