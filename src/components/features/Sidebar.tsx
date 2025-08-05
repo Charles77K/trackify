@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { MdDashboard, MdMenu, MdClose } from "react-icons/md";
 import { ImBook } from "react-icons/im";
-import {
-  FaComments,
-  FaPowerOff,
-  FaShopify,
-  FaShoppingBag,
-} from "react-icons/fa";
+import { FaPowerOff, FaShopify, FaShoppingBag, FaUsers } from "react-icons/fa";
 import { FaUserTie } from "react-icons/fa";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Modal from "../ui/Modal";
 import Toast from "../../lib/Toast";
 import type { ModalRef } from "../ui/Modal";
+import { FaLocationDot } from "react-icons/fa6";
 import { useCreate } from "../../services/tanstack-helpers";
 import TokenStorage from "../../services/tokenStorage";
 import { useDispatch } from "react-redux";
@@ -24,9 +20,8 @@ const NAV_LINKS = [
   { path: "/sales", label: "Sales", icon: <FaShopify /> },
   { path: "/categories", label: "Categories", icon: <FaUserTie /> },
   { path: "/purchases", label: "Purchases", icon: <FaShoppingBag /> },
-  { path: "/outlets", label: "Outlets", icon: <FaComments /> },
-  { path: "/users", label: "Users", icon: <FaComments /> },
-  { path: "/settings", label: "Settings", icon: <FaComments /> },
+  { path: "/outlets", label: "Outlets", icon: <FaLocationDot /> },
+  { path: "/users", label: "Users", icon: <FaUsers /> },
 ];
 
 const Sidebar = () => {
@@ -82,7 +77,7 @@ const Sidebar = () => {
     <>
       <div className="flex items-center mb-8">
         <h1 className="text-xl md:text-2xl font-bold text-white">
-          Inferno Hotel
+          The Grand Plaza Hotel
         </h1>
         <button
           onClick={() => setIsMobileMenuOpen(false)}
@@ -133,7 +128,9 @@ const Sidebar = () => {
       {/* Mobile Top Bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 border-b border-gray-200 p-4 z-40">
         <div className="flex flex-row-reverse items-center justify-between">
-          <h1 className="text-xl font-bold text-black">TeachRank</h1>
+          <h1 className="text-xl font-bold text-black">
+            The Grand Plaza Hotel
+          </h1>
           <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="p-2 hover:bg-gray-100 rounded-lg"

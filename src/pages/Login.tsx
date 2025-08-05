@@ -51,7 +51,7 @@ const Login = () => {
           <div className="max-w-md mx-auto w-full">
             <div className="mb-10">
               <h1 className="font-semibold text-sidebar text-center text-2xl md:text-3xl mb-3">
-                Welcome back to Trackify
+                Welcome back to SmartQ
               </h1>
               <p className="font-inter text-center text-text-primary font-light text-sm">
                 Enter your username and password to continue
