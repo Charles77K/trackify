@@ -100,8 +100,6 @@ const CreateSale = ({ onComplete }: { onComplete: () => void }) => {
       <InputField
         label="Total Price"
         type="text"
-        defaultValue={60}
-        readOnly
         {...register("total_price")}
         placeholder="Enter total price (e.g. 250.00)"
         error={errors?.total_price}
