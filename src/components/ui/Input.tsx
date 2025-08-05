@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import { forwardRef, type ReactNode, type InputHTMLAttributes } from "react";
 import { type FieldError, type FieldErrors } from "react-hook-form";
+import { cn } from "../../lib/utils";
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   htmlFor?: string;
@@ -20,8 +20,8 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       typeof error === "string"
         ? error
         : error && "message" in error
-          ? error.message
-          : undefined;
+        ? error.message
+        : undefined;
 
     return (
       <div className="text-sm flex flex-1 flex-col gap-1">
