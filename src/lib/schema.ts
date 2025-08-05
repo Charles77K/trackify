@@ -62,10 +62,7 @@ export const SalesSchema = z.object({
     .int()
     .min(0, "Quantity must be at least 0")
     .max(MAX_INT)
-    .refine((val) => !isNaN(val), { message: "Quantity is required" }),
-  total_price: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/, "Total price must be a valid decimal"),
+    .refine((val) => !isNaN(val), { message: "Quantity is required" })
 });
 
 export type SalesFormData = z.infer<typeof SalesSchema>;
