@@ -215,7 +215,7 @@ class AxiosHelper {
     data: D
   ): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await this.client.put(
+      const response: AxiosResponse<T> = await this.client.patch(
         `${endpoint}/${id}/`,
         data
       );

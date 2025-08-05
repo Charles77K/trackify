@@ -40,7 +40,6 @@ const Categories = () => {
     setEditingId(category.id);
     setEditingName(category.name);
   };
-
   const handleSaveEdit = () => {
     update(
       { id: editingId, data: { name: editingName } },

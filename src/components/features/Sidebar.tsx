@@ -3,7 +3,6 @@ import { MdDashboard, MdMenu, MdClose } from "react-icons/md";
 import { ImBook } from "react-icons/im";
 import {
   FaComments,
-  FaGraduationCap,
   FaPowerOff,
   FaShopify,
   FaShoppingBag,
@@ -15,6 +14,9 @@ import Toast from "../../lib/Toast";
 import type { ModalRef } from "../ui/Modal";
 import { useCreate } from "../../services/tanstack-helpers";
 import TokenStorage from "../../services/tokenStorage";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../store/store";
+import { logout } from "../../store/slices/authSlice";
 
 const NAV_LINKS = [
   { path: "/", label: "Dashboard", icon: <MdDashboard /> },
@@ -34,13 +36,14 @@ const Sidebar = () => {
   const modalRef = React.useRef<ModalRef>(null);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const dispatch: AppDispatch = useDispatch();
   const handleLogout = () => {
     mutate(
       { refresh_token: refreshToken },
       {
         onSuccess: () => {
           Toast.success("Success", "You've successfully logged out");
+          dispatch(logout());
           modalRef.current?.close();
           navigate("/login", { replace: true });
         },

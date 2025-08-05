@@ -11,3 +11,24 @@ export const loginSchema = z.object({
     .regex(/[a-z]/, { message: "Password must contain a lowercase character" }),
 });
 export type LoginSchema = z.infer<typeof loginSchema>;
+
+export const itemFormSchema = z.object({
+  item: z
+    .number()
+    .min(0, "Item must be at least 0")
+    .max(9223372036854776000, "Item is too large"),
+  quantity: z
+    .string("Quantity is required")
+    .min(0, "Quantity must be at least 0")
+    .max(9223372036854776000, "Quantity is too large"),
+  supplier: z
+    .string()
+    .max(255, "Max length is 255 characters")
+    .nullable()
+    .optional(),
+  cost: z
+    .string("Cost is required")
+    .regex(/^\d+(\.\d{1,2})?$/, "Cost must be a decimal (e.g., 10.00)"),
+});
+
+export type ItemFormData = z.infer<typeof itemFormSchema>;

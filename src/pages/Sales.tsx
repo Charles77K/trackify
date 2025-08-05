@@ -77,11 +77,9 @@ const Sales = () => {
       <div className="w-full p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-sidebar">
-            User Management
-          </h2>
+          <h2 className="text-xl font-semibold text-sidebar">Sales</h2>
           <button className="px-4 py-2 text-sm bg-sidebar text-white rounded hover:bg-sidebar-active transition">
-            Add New User
+            Add New Sake
           </button>
         </div>
         {/* Your skeleton loader component here */}
