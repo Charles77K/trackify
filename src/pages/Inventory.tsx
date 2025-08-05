@@ -15,6 +15,9 @@ import TableSkeleton from "../components/admin/TableSkeleton";
 import ErrorHandler from "../components/admin/ErrorHandler";
 import EmptyState from "../components/admin/EmptyState";
 import Modal from "../components/ui/Modal";
+import type { Category } from "./Categories";
+import CreateModal from "../components/admin/CreateModal";
+import CreateInventory from "../components/admin/CreateInventory";
 
 // Inventory type
 export type InventoryItem = {
@@ -58,15 +61,7 @@ const EditCell = ({ row, table }: any) => {
             title="Save"
             disabled={meta?.isUpdating}
           >
-            {meta?.isUpdating ? (
-              <div className="flex space-x-1">
-                <div className="w-1 h-1 bg-green-600 rounded-full animate-pulse"></div>
-                <div className="w-1 h-1 bg-green-600 rounded-full animate-pulse delay-75"></div>
-                <div className="w-1 h-1 bg-green-600 rounded-full animate-pulse delay-150"></div>
-              </div>
-            ) : (
-              <Check size={16} />
-            )}
+            <Check size={16} />
           </button>
           <button
             onClick={setEditedRows}
@@ -80,21 +75,27 @@ const EditCell = ({ row, table }: any) => {
         </>
       ) : (
         <>
-          <button
-            onClick={setEditedRows}
-            name="edit"
-            className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-            title="Edit"
-          >
-            <Edit2 size={16} />
-          </button>
-          <button
-            onClick={() => meta?.handleDelete(row.original.id)}
-            className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-            title="Delete"
-          >
-            <Trash2 size={16} />
-          </button>
+          {meta.isUpdating ? (
+            <p className="text-xs text-gray-400">updating...</p>
+          ) : (
+            <>
+              <button
+                onClick={setEditedRows}
+                name="edit"
+                className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                title="Edit"
+              >
+                <Edit2 size={16} />
+              </button>
+              <button
+                onClick={() => meta?.handleDelete(row.original.id)}
+                className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                title="Delete"
+              >
+                <Trash2 size={16} />
+              </button>
+            </>
+          )}
         </>
       )}
     </div>
@@ -103,6 +104,7 @@ const EditCell = ({ row, table }: any) => {
 
 const Inventory = () => {
   const modalRef = useRef<ModalRef>(null);
+  const createModalRef = useRef<ModalRef>(null);
   const [editedRows, setEditedRows] = useState<Record<string, boolean>>({});
   const [itemId, setItemId] = useState<string | number>("");
 
@@ -121,7 +123,8 @@ const Inventory = () => {
   const { mutate: updateItem, isPending: isUpdating } = useUpdate("/inventory");
 
   // fetch categories
-  const { data: categories } = useFetch("/categories/");
+  const { data: category } = useFetch<{ results: Category[] }>("/categories/");
+  const categories = category?.results;
 
   const prevDataRef = useRef<InventoryItem[]>(null);
 
@@ -157,16 +160,16 @@ const Inventory = () => {
           <EditableTableCell
             {...props}
             inputType="select"
-            selectOptions={categories}
+            selectOptions={categories!}
           />
         ),
       }),
       columnHelper.accessor("quantity", {
-        header: "Stock",
+        header: "Quantity",
         cell: EditableTableCell,
       }),
       columnHelper.accessor("min_quantity", {
-        header: "Min Level",
+        header: "Min qty",
         cell: EditableTableCell,
       }),
       columnHelper.accessor("cost_price", {
@@ -279,12 +282,15 @@ const Inventory = () => {
     );
 
   return (
-    <div className="w-full p-4 bg-white">
+    <div className="w-full p-4 bg-white rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-xl font-semibold text-sidebar">
           Inventory Management
         </h1>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button
+          onClick={() => createModalRef.current?.open()}
+          className="flex items-center gap-2 bg-sidebar text-white px-4 py-2 rounded-lg hover:bg-sidebar-active"
+        >
           <Plus size={18} /> Add Item
         </button>
       </div>
@@ -293,6 +299,7 @@ const Inventory = () => {
         {content}
       </div>
 
+      {/* delete modal */}
       <Modal
         ref={modalRef}
         title="Are you sure you want to delete this item?"
@@ -311,6 +318,11 @@ const Inventory = () => {
           });
         }}
       />
+
+      {/* create modal */}
+      <CreateModal ref={createModalRef}>
+        <CreateInventory onComplete={() => createModalRef.current?.close()} />
+      </CreateModal>
     </div>
   );
 };

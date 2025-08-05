@@ -11,7 +11,7 @@ import type { ModalRef } from "../components/ui/Modal";
 import Modal from "../components/ui/Modal";
 import Skeleton from "react-loading-skeleton";
 
-type Category = {
+export type Category = {
   id: number;
   name: string;
 };
@@ -26,6 +26,7 @@ const Categories = () => {
   }>("/categories/");
 
   const { mutate: update, isPending: isUpdating } = useUpdate("/categories");
+
   const { mutate: deleteData, isPending: isDeleting } =
     useDelete("/categories");
   const categories = data?.results || [];
@@ -101,7 +102,7 @@ const Categories = () => {
     return (
       <div className="w-full p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">Categories</h2>
+          <h2 className="text-xl font-semibold text-sidebar">Categories</h2>
         </div>
         <div className="space-y-10">
           {Array.from({ length: 5 }).map((_, i) => (

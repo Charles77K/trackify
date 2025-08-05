@@ -10,10 +10,25 @@ import {
 } from "react-icons/fa";
 import { StatCardSkeleton } from "../components/ui/Skeletons";
 import type { DashboardStats } from "../lib/types";
+import type { InventoryItem } from "./Inventory";
+import { useMemo } from "react";
 
 const Dashboard = () => {
   const { data: statData, isLoading: statsLoading } =
     useFetch<DashboardStats>("/dashboard/stats/");
+
+  const { data: stock, isPending } = useFetch<{ results: InventoryItem[] }>(
+    "/inventory/"
+  );
+
+  // Filter low stock items using the is_low_stock property or quantity < min_quantity
+  const lowStock: InventoryItem[] = useMemo(() => {
+    if (!stock?.results) return [];
+    return stock.results.filter(
+      (item) => item.is_low_stock || item.quantity <= item.min_quantity
+    );
+  }, [stock?.results]);
+
   const stats = [
     {
       icon: <FaUsers size={20} color="white" />,
@@ -28,7 +43,7 @@ const Dashboard = () => {
       color: "yellow",
       trend: "up",
       change: "+5.3%",
-      value: statData?.low_stock_items || "0",
+      value: lowStock.length || "0",
       title: "Low Stock Items",
     },
     {
@@ -52,7 +67,7 @@ const Dashboard = () => {
   return (
     <div>
       <div className="grid grid-cols-2 gap-5 md:grid-cols-3 2xl:grid-cols-4">
-        {statsLoading
+        {statsLoading || isPending
           ? Array.from({ length: 4 }).map((_, idx) => (
               <StatCardSkeleton key={idx} />
             ))

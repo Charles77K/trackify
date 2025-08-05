@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 
 interface SelectOption {
-  value: string;
-  label: string;
+  id: number;
+  name: string;
 }
 
 interface EditableTableCellProps {
@@ -57,8 +57,8 @@ const EditableTableCell: React.FC<EditableTableCellProps> = ({
         >
           <option value="">{placeholder || "Select an option"}</option>
           {selectOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+            <option key={option.id} value={option.name}>
+              {option.name}
             </option>
           ))}
         </select>

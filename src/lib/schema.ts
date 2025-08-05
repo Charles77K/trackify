@@ -87,3 +87,20 @@ export const outletFormSchema = z.object({
 });
 
 export type OutletFormData = z.infer<typeof outletFormSchema>;
+
+//
+//
+//
+//
+//inventory schema
+export const InventorySchema = z.object({
+  name: z.string().min(1, "Item name is required"),
+  category: z.string().min(1, "Category is required"),
+  quantity: z.number().min(0, "Quantity must be non-negative"),
+  min_quantity: z.number().min(0, "Minimum quantity must be non-negative"),
+  unit: z.string().min(1, "Unit is required"),
+  cost_price: z.string().min(1, "Cost price is required"),
+  selling_price: z.string().min(1, "Selling price is required"),
+});
+
+export type InventoryFormData = z.infer<typeof InventorySchema>;

@@ -254,7 +254,9 @@ const Outlets = () => {
   return (
     <div className="w-full p-4 bg-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Outlet Management</h1>
+        <h1 className="text-xl font-semibold text-sidebar">
+          Outlet Management
+        </h1>
         <button
           onClick={() => createModalRef.current?.open()}
           className="flex items-center gap-2 bg-sidebar text-white px-4 py-2 rounded-lg hover:bg-sidebar-active"

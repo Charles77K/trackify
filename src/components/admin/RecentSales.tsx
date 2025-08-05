@@ -6,52 +6,26 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import { useFetch } from "../../services/tanstack-helpers";
+import TableSkeleton from "../../components/admin/TableSkeleton";
+import EmptyState from "../../components/admin/EmptyState";
 
-const columnHelper = createColumnHelper<Sale>();
+import { Link } from "react-router-dom";
 
-// Dummy data type
-type Sale = {
-  id: string;
-  date: string;
-  outlet: string;
-  total: string;
-  action: string;
+type RecentSale = {
+  id: number;
+  item_name: string;
+  outlet_name: string;
+  quantity: string;
+  total_price: string;
+  user_name: string;
+  timestamp: string;
 };
 
-// Dummy data
-const salesData: Sale[] = [
-  {
-    id: "001",
-    date: "June 15",
-    outlet: "Outlet A",
-    total: "$150.00",
-    action: "View",
-  },
-  {
-    id: "002",
-    date: "June 12",
-    outlet: "Outlet B",
-    total: "$245.99",
-    action: "View",
-  },
-  {
-    id: "003",
-    date: "June 13",
-    outlet: "Outlet C",
-    total: "$95.20",
-    action: "View",
-  },
-  {
-    id: "004",
-    date: "June 15",
-    outlet: "Outlet A",
-    total: "$310.00",
-    action: "View",
-  },
-];
+const columnHelper = createColumnHelper<RecentSale>();
 
 const RecentSales = () => {
-  // const { data: recentSales } = useFetch("/dashboard/recent-sales/");
+  const { data, isLoading } = useFetch("/dashboard/recent-sales/");
+  const sales = data?.results;
 
   const columns = useMemo(
     () => [
@@ -59,48 +33,60 @@ const RecentSales = () => {
         header: "ID",
         cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor("date", {
-        header: "Date",
+      columnHelper.accessor("item_name", {
+        header: "Name",
         cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor("outlet", {
+      columnHelper.accessor("outlet_name", {
         header: "Outlet",
         cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor("total", {
-        header: "Total",
+      columnHelper.accessor("quantity", {
+        header: "Quantity",
         cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor("action", {
-        header: "Action",
-        cell: (info) => (
-          <button className="text-blue-600 hover:underline text-sm">
-            {info.getValue()}
-          </button>
-        ),
+      columnHelper.accessor("total_price", {
+        header: "Price",
+        cell: (info) => info.getValue(),
+      }),
+
+      columnHelper.accessor("timestamp", {
+        header: "Date Created",
+        cell: (info) => {
+          const date = new Date(info.getValue());
+          return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        },
       }),
     ],
     []
   );
 
-  const table = useReactTable<Sale>({
-    data: salesData,
+  const table = useReactTable<RecentSale>({
+    data: sales || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
+  if (isLoading) {
+    return <TableSkeleton />;
+  }
+
   return (
     <div className="w-full p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-sidebar">Recent Sales</h2>
-        <button className="px-4 py-2 text-sm bg-sidebar text-white rounded hover:bg-sidebar-active transition">
-          <span className="mr-2">+</span>
-          New Sale
-        </button>
+        <Link
+          to={"/sales"}
+          className="px-4 py-2 text-sm bg-sidebar text-white rounded-lg hover:bg-sidebar-active transition"
+        >
+          View All Sales
+        </Link>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-left">
           <thead className="bg-gray-50">
@@ -109,7 +95,7 @@ const RecentSales = () => {
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-3 text-base font-semibold text-sidebar"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -133,6 +119,8 @@ const RecentSales = () => {
           </tbody>
         </table>
       </div>
+
+      {sales && sales.length === 0 && <EmptyState title="sales" />}
     </div>
   );
 };

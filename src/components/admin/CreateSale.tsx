@@ -6,10 +6,22 @@ import { useCreate, useFetch } from "../../services/tanstack-helpers";
 import Toast from "../../lib/Toast";
 import { SalesSchema, type SalesFormData } from "../../lib/schema";
 import SelectInput from "../ui/SelectInput";
+import type { OutletItem } from "../../pages/Outlets";
+import type { InventoryItem } from "../../pages/Inventory";
 
 const CreateSale = ({ onComplete }: { onComplete: () => void }) => {
-  const { data, isPending, isError } = useFetch("/outlets/");
-  const { mutate, isPending: isCreating } = useCreate("/purchases/");
+  const { data, isPending, isError } = useFetch<{ results: OutletItem[] }>(
+    "/outlets/"
+  );
+  const {
+    data: item,
+    isPending: isItemPending,
+    isError: itemError,
+  } = useFetch<{ results: InventoryItem[] }>("/inventory/");
+
+  const inventory = item?.results;
+  const outlets = data?.results;
+  const { mutate, isPending: isCreating } = useCreate("/sales/");
   const {
     register,
     handleSubmit,
@@ -42,33 +54,41 @@ const CreateSale = ({ onComplete }: { onComplete: () => void }) => {
     <form onSubmit={handleSubmit(onSubmit)} className="mx-auto space-y-4">
       <Controller
         name="outlet"
-        control={control} // required
+        control={control}
         render={({ field }) => (
           <SelectInput
             label="Outlet"
             value={field.value}
-            options={data}
+            options={outlets!}
             isError={isError}
-            onChange={field.onChange}
-            optionMain={(option) => option as string}
-            optionValue={(option) => option as string}
             isLoading={isPending}
-            placeholder="Enter outlet ID"
+            onChange={(val) => field.onChange(Number(val))}
+            optionMain={(option) => option.name}
+            optionValue={(option) => option.id as number}
+            placeholder="Enter outlet"
             error={errors?.outlet}
           />
         )}
       />
 
-      <InputField
-        label="Item"
-        type="number"
-        defaultValue={1}
-        readOnly
-        {...register("item", { valueAsNumber: true })}
-        placeholder="Enter item ID"
-        error={errors?.item}
+      <Controller
+        name="item"
+        control={control}
+        render={({ field }) => (
+          <SelectInput
+            label="Item"
+            value={field.value}
+            options={inventory!}
+            isError={itemError}
+            isLoading={isItemPending}
+            onChange={(val) => field.onChange(Number(val))}
+            optionMain={(option) => option.name}
+            optionValue={(option) => option.id as number}
+            placeholder="Enter item"
+            error={errors?.outlet}
+          />
+        )}
       />
-
       <InputField
         label="Quantity"
         type="number"
@@ -80,6 +100,8 @@ const CreateSale = ({ onComplete }: { onComplete: () => void }) => {
       <InputField
         label="Total Price"
         type="text"
+        defaultValue={60}
+        readOnly
         {...register("total_price")}
         placeholder="Enter total price (e.g. 250.00)"
         error={errors?.total_price}
